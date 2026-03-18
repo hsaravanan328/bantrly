@@ -131,5 +131,7 @@ This app is deployed on [Netlify](https://netlify.com). To deploy your own copy:
 
 Every push to `main` will automatically trigger a new deploy.
 
+Link to the [site](https://bantrlyharini.netlify.app/)
+
 ---
 
