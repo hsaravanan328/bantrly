@@ -1,0 +1,433 @@
+{
+  "_schema_version": "4.0",
+  "_last_updated": "2025",
+  "_mission": "Train HOW students speak, not WHAT they know.",
+  "_core_rule": "Text is always on screen. Student never generates content. Only job is delivery.",
+  "_two_unbreakable_rules": {
+    "rule_1": "practice.recording.scored = false — always, no exceptions",
+    "rule_2": "perform.recording.scored  = true  — always, no exceptions"
+  },
+  "_waveform_rule": {
+    "model_waveform":   "#22C55E — green, always",
+    "student_waveform": "#2563EB — blue, always",
+    "why": "Students learn one visual rule: green = target, blue = me. Never swap."
+  },
+
+  "lesson": {
+
+    "meta": {
+      "lesson_id":    "string — unique across all lessons, e.g. lesson_001",
+      "lesson_type":  "scrambled_story | pace_difference | emotion_difference | character_read | tongue_twister | speed_reader | listen_and_echo | scene_speak | comic_reader | refresher | topic_read | delivery_flashcard",
+      "title":        "string — display name shown on screen",
+      "subtitle":     "string — one-line description shown under title",
+      "domain":       "speaking | listening_to_speaking | reading_writing_speaking",
+      "grade_bucket": "spark | builder | explorer | achiever",
+      "duration_sec": "integer 30–60 — hard cap, never exceed 60",
+      "skill":        "string — single skill trained, e.g. Vocal Variety and Delivery",
+      "signals":      ["pronunciation | prosody | speaking_rate | fluency | volume | stress | task_adherence"],
+      "xp":           "10 | 15 | 20 | 25 | 30"
+    },
+
+    "quest": {
+      "unit":       "integer 1–4",
+      "unit_name":  "string — e.g. Find Your Voice",
+      "quest":      "integer 1–4 within the unit",
+      "quest_name": "string — e.g. The Newsroom",
+      "position":   "1 | 2 | 3 — position within the quest",
+      "unlocks":    "lesson_id of next lesson | null"
+    },
+
+    "rounds": [
+      {
+        "_note": "Every lesson has 1–3 rounds. Every round has content + model + practice + perform. Exception: refresher has no model or practice — see lesson_types.",
+        "round_id":    "r1 | r2 | r3",
+        "type":        "must match meta.lesson_type",
+        "instruction": "string — shown above the round on screen",
+
+        "content": {
+          "_note": "Shape varies by lesson type. See content_schemas below for each type."
+        },
+
+        "model": {
+          "_note": "App demonstrates how it should sound. Student watches and listens only. Zero pressure.",
+          "label":       "string — e.g. 👀 Watch First | 🎧 Listen First | 👀 Hear All 3",
+          "prompt_text": "string — instruction shown above the demo",
+          "display": {
+            "show_sentence":                  "boolean",
+            "highlight_words":                ["array of key words to highlight"],
+            "show_characters_preview":        "boolean — for character_read",
+            "show_emotions_preview":          "boolean — for emotion_difference",
+            "show_speed_dial":                "boolean — for pace_difference",
+            "highlight_focus_letters":        "boolean — for tongue_twister",
+            "plays_sequence":                 "boolean — true when model plays multiple versions"
+          },
+          "audio": {
+            "type":             "tts | prerecorded",
+            "voice_character":  "Coach Maya | Coach Marcus",
+            "pace":             "slow_clear | measured | natural | fast_excited | deliberate_conviction",
+            "plays_sequence":   ["array of sequence items when multiple versions played — e.g. emotions, speeds, characters"],
+            "caption_enabled":  true,
+            "waveform_visible": true,
+            "waveform_color":   "#22C55E"
+          },
+          "visual_cue": {
+            "character":   "bantrly_mascot",
+            "expression":  "string — e.g. confident | excited | storytelling | focused",
+            "animation":   "string — e.g. talking | jumping | slow_nod | speed_dial_sweeping"
+          },
+          "replay_allowed": true,
+          "replay_limit":   "integer | null — null means unlimited",
+          "replay_label":   "string — e.g. ▶ Hear it again",
+          "advance_label":  "string — e.g. Got it! Let me try →"
+        },
+
+        "practice": {
+          "_note": "Student imitates once. NOT scored. Hints visible. Can skip. Mistakes cost nothing.",
+          "label":       "string — e.g. 🗣️ Practice Try",
+          "prompt_text": "string — low pressure, never mentions scoring",
+          "display": {
+            "show_sentence":          "boolean",
+            "show_blank_placeholder": "boolean — for listen_and_echo",
+            "placeholder_text":       "string — shown when sentence is hidden",
+            "show_hint":              true,
+            "hint_text":              "string — specific delivery tip for this lesson type",
+            "reveal_button": {
+              "enabled":           "boolean — for listen_and_echo only",
+              "label":             "string — e.g. 👁️ Peek at sentence",
+              "reveal_for_seconds": "integer — how long sentence shows before hiding again"
+            }
+          },
+          "recording": {
+            "enabled":    true,
+            "scored":     false,
+            "max_seconds": "integer 6–20 — shorter than perform"
+          },
+          "feedback": {
+            "type":     "encouragement_only",
+            "messages": ["array of positive strings — no numbers, no scores ever"]
+          },
+          "advance_label": "string — e.g. Ready for the real thing! →",
+          "skip_label":    "string — e.g. Skip practice"
+        },
+
+        "perform": {
+          "_note": "Student records for real. SCORED. Hints hidden. Waveform comparison shown after.",
+          "label":       "string — e.g. 🎯 Real Attempt",
+          "prompt_text": "string — communicates this counts",
+          "display": {
+            "show_sentence":          "boolean",
+            "show_blank_placeholder": "boolean — for listen_and_echo",
+            "placeholder_text":       "string",
+            "show_hint":              false,
+            "show_one_at_a_time":     "boolean — for multi-version lessons (emotions, characters, speeds)"
+          },
+          "recording": {
+            "enabled":                        true,
+            "scored":                         true,
+            "max_seconds":                    "integer 8–30",
+            "record_each_separately":         "boolean — true for emotion, character, speed, tongue_twister",
+            "max_seconds_per_item":           "integer — used when record_each_separately is true",
+            "timed":                          "boolean — true for speed_reader only",
+            "time_limit_sec":                 "integer — for speed_reader only"
+          },
+          "scoring": {
+            "signals_measured":               ["must match subset of meta.signals"],
+            "score_each_separately":          "boolean — true for emotion, character, speed",
+            "show_waveform":                  "boolean",
+            "waveform_color":                 "#2563EB",
+            "compare_to_model":               "boolean",
+            "comparison_label":               "string — e.g. Green = model · Blue = you",
+            "reveal_sentence_after_scoring":  "boolean — for listen_and_echo only",
+            "reveal_label":                   "string — e.g. The sentence was:",
+            "show_wpm_result":                "boolean — for pace_difference and speed_reader",
+            "personal_best_tracking":         "boolean — for speed_reader only",
+            "star_thresholds": {
+              "_note": "tongue_twister only",
+              "1_star": 0.60,
+              "2_stars": 0.75,
+              "3_stars": 0.90
+            }
+          }
+        }
+      }
+    ],
+
+    "reward": {
+      "xp":      "integer — must match meta.xp",
+      "badge":   "string | null — non-null only when quest.position = 3",
+      "message": "string — celebration text shown on lesson complete screen",
+      "unlocks": "lesson_id | null — must match quest.unlocks"
+    }
+  },
+
+  "content_schemas": {
+    "_note": "The shape of rounds[].content for each lesson type.",
+
+    "scrambled_story": {
+      "_how_it_works": "order_task runs BEFORE model/practice/perform. After correct order → model reads assembled story → practice → perform.",
+      "order_task": {
+        "prompt":     "string — instruction shown above the drag task",
+        "sentences":  [{ "id": "integer", "text": "string", "correct_position": "integer" }],
+        "on_correct": "string — message shown when order is right",
+        "on_wrong":   "string — message shown when order is wrong"
+      }
+    },
+
+    "pace_difference": {
+      "_how_it_works": "Model plays both speeds. Practice = slow only. Perform = both speeds recorded separately, each scored.",
+      "sentence": "string",
+      "speeds": [
+        { "label": "🐢 Slow", "target_wpm": 80,  "instruction": "string" },
+        { "label": "🐇 Fast", "target_wpm": 165, "instruction": "string" }
+      ]
+    },
+
+    "emotion_difference": {
+      "_how_it_works": "Model plays all emotions. Practice = first emotion only. Perform = one at a time, each scored.",
+      "_bucket_rule": "Spark = 2 emotions, hints visible in perform. Explorer/Achiever = 4–5 emotions, no hints in perform.",
+      "sentence": "string",
+      "emotions": [
+        { "emoji": "😢", "label": "SAD",   "hint": "string — delivery tip" },
+        { "emoji": "😡", "label": "ANGRY", "hint": "string — delivery tip" },
+        { "emoji": "😄", "label": "HAPPY", "hint": "string — delivery tip" }
+      ]
+    },
+
+    "character_read": {
+      "_how_it_works": "Model plays both characters. Practice = first character only. Perform = each character recorded separately, each scored.",
+      "sentence": "string",
+      "characters": [
+        {
+          "id":          "string",
+          "name":        "string",
+          "badge_emoji": "string",
+          "voice_hint":  "string — delivery instruction for this character",
+          "style":       "string — e.g. flat_monotone | fast_excited",
+          "color":       "string — hex color for UI badge"
+        }
+      ]
+    },
+
+    "tongue_twister": {
+      "_how_it_works": "Model plays all 3 speeds. Practice = slow only. Perform = all 3 speeds recorded separately, stars awarded per clarity threshold.",
+      "text":                    "string — the full tongue twister",
+      "focus_sound":             "string — e.g. S — letter highlighted in UI",
+      "highlight_focus_letters": true,
+      "levels": [
+        { "level": 1, "label": "⭐ Slow",    "target_wpm": 70,  "instruction": "string", "star_reward": 1 },
+        { "level": 2, "label": "⭐⭐ Medium", "target_wpm": 120, "instruction": "string", "star_reward": 2 },
+        { "level": 3, "label": "⭐⭐⭐ Fast", "target_wpm": 170, "instruction": "string", "star_reward": 3 }
+      ]
+    },
+
+    "speed_reader": {
+      "_how_it_works": "Model demos target pace with 3 sample sentences. Practice = 2 sentences, no timer. Perform = timed sprint, score = count × clarity.",
+      "_bucket_rule": "Spark = 20s, 4–5 word sentences. Builder = 25s. Explorer/Achiever = 30s, complex sentences.",
+      "time_limit_sec": "integer — 20 | 25 | 30",
+      "target_wpm":     160,
+      "sentences":      ["array of 10–15 strings — pool to draw from during timed sprint"],
+      "scoring_method": "sentences_completed × clarity_score",
+      "clarity_minimum_to_count": 0.6,
+      "personal_best_tracking": true
+    },
+
+    "listen_and_echo": {
+      "_how_it_works": "Model plays sentence (visible). Sentence disappears. Practice = hidden, peek button available. Perform = hidden, no peek, sentence revealed after scoring.",
+      "_bucket_rule": "Spark = replay_limit 3. Builder = 2. Explorer/Achiever = 1.",
+      "sentence":    "string",
+      "difficulty":  "easy | medium | hard",
+      "word_count":  "integer"
+    },
+
+    "scene_speak": {
+      "_how_it_works": "3 sequential domain steps: step_1 read paragraph (scored), step_2 write one sentence (not scored — scaffold only), step_3 speak description (scored).",
+      "_note": "Writing task in step_2 is a scaffold for speaking in step_3. It is not a writing assessment.",
+      "image": {
+        "url":         "string",
+        "alt_text":    "string — required for accessibility",
+        "scene_label": "string — e.g. 🌅 Morning Market"
+      },
+      "paragraph":      "string — 3–5 sentences, grade-level appropriate",
+      "writing_prompt": "string — shown in step_2, e.g. In one sentence — what is the most important thing happening here?",
+      "speaking_prompt": "string — shown in step_3, e.g. Describe what you see in your own words."
+    },
+
+    "comic_reader": {
+      "_how_it_works": "Model reads all panels and all characters. Practice = student reads full script once, not scored. Perform = student reads entire comic, both voices, scored on vocal variety.",
+      "scene_title": "string",
+      "characters": [
+        { "id": "string", "name": "string", "voice_hint": "string", "bubble_color": "string hex" }
+      ],
+      "panels": [
+        {
+          "panel_id":  "string",
+          "image_url": "string",
+          "alt_text":  "string — required for accessibility",
+          "lines": [
+            { "character": "string — matches character id", "text": "string", "emotion_hint": "string" }
+          ]
+        }
+      ]
+    },
+
+    "refresher": {
+      "_how_it_works": "No model. No practice. Straight to 3 perform moments pulled from completed lessons. Scoring weight 0.75 (lighter than standard).",
+      "_unlock_rule": "Only available after student has completed 5+ lessons.",
+      "auto_generated": true,
+      "source_lesson_ids": ["array of completed lesson_ids to pull moments from"],
+      "moments": [
+        {
+          "moment_id":   "m1 | m2 | m3",
+          "pulled_from": "lesson_id",
+          "type":        "string — lesson type of the source lesson",
+          "label":       "string — e.g. ⚡ Quick Emotion",
+          "instruction": "string — short, e.g. Say it ANGRY — 8 seconds!",
+          "content":     "object — exact content pulled from source lesson",
+          "max_seconds": 8,
+          "scored":      true
+        }
+      ],
+      "scoring_weight": 0.75
+    },
+
+    "topic_read": {
+      "_how_it_works": "Student picks a topic they like. Model reads passage. Practice = student reads once. Perform = fluent scored read. Topic is engagement only — not a learning goal.",
+      "_removed_fields": "vocab_words and comprehension_question removed — those are content learning, out of scope.",
+      "topic":            "space | food | animals | science | history",
+      "topic_emoji":      "string",
+      "topic_label":      "string",
+      "passage":          "string — 3–5 sentences, grade-level appropriate",
+      "selectable_topics": [
+        { "slug": "string", "emoji": "string", "label": "string" }
+      ]
+    },
+
+    "delivery_flashcard": {
+      "_how_it_works": "Card front shows phrase. Card flips to back. Back shows delivery instruction — HOW to say it, never WHAT it means. 3 cards per lesson.",
+      "_mission_check": "Card back must never explain vocabulary or meaning. Only delivery: which word to stress, what tone, what volume.",
+      "card_format": "stress_card | delivery_card | voice_card",
+      "cards": [
+        {
+          "front": {
+            "phrase":       "string — the phrase to read",
+            "flip_prompt":  "string — e.g. Tap to flip →"
+          },
+          "back": {
+            "delivery_type": "stress | delivery | voice",
+            "target_word":   "string | null — for stress_card only, the word to emphasise",
+            "instruction":   "string — how to deliver it",
+            "detail":        "string — why this delivery matters",
+            "tone_label":    "string | null — e.g. 😐 Calm and certain",
+            "pace_label":    "string | null — e.g. 🐢 Slow",
+            "volume_level":  "integer 1–4 | null — for voice_card: 1=whisper 4=roar",
+            "volume_emoji":  "string | null — e.g. 📢",
+            "scenario":      "string | null — for voice_card: context for why this volume"
+          }
+        }
+      ]
+    }
+  },
+
+  "voice_signals_reference": {
+    "pronunciation":  "Clarity of sounds, consonant precision, vowel accuracy",
+    "prosody":        "Rhythm, stress, intonation, melodic variation",
+    "speaking_rate":  "Tempo, pause placement, timing control",
+    "fluency":        "Speech flow, hesitation markers, self-repairs",
+    "volume":         "Loudness consistency, dynamic range, projection",
+    "stress":         "Word-level emphasis — which words stand out above others",
+    "task_adherence": "Followed topic, format, and structure of the task"
+  },
+
+  "grade_bucket_rules": {
+    "spark": {
+      "grades": "K–2", "ages": "5–8",
+      "max_sentence_words":          8,
+      "max_emotions":                2,
+      "hints_visible_in_perform":    true,
+      "max_duration_sec":            40,
+      "scrambled_sentence_count":    4,
+      "tongue_twister_words":        "5–7",
+      "speed_reader_time_sec":       20,
+      "listen_echo_replay_limit":    3
+    },
+    "builder": {
+      "grades": "3–5", "ages": "8–11",
+      "max_sentence_words":          12,
+      "max_emotions":                3,
+      "hints_visible_in_perform":    false,
+      "max_duration_sec":            50,
+      "scrambled_sentence_count":    5,
+      "tongue_twister_words":        "10–14",
+      "speed_reader_time_sec":       25,
+      "listen_echo_replay_limit":    2
+    },
+    "explorer": {
+      "grades": "6–8", "ages": "11–14",
+      "max_sentence_words":          18,
+      "max_emotions":                4,
+      "hints_visible_in_perform":    false,
+      "max_duration_sec":            55,
+      "scrambled_sentence_count":    6,
+      "tongue_twister_words":        "full classic",
+      "speed_reader_time_sec":       30,
+      "listen_echo_replay_limit":    1
+    },
+    "achiever": {
+      "grades": "9–12", "ages": "14–18",
+      "max_sentence_words":          25,
+      "max_emotions":                5,
+      "hints_visible_in_perform":    false,
+      "max_duration_sec":            60,
+      "scrambled_sentence_count":    6,
+      "tongue_twister_words":        "multi-line",
+      "speed_reader_time_sec":       30,
+      "listen_echo_replay_limit":    1
+    }
+  },
+
+  "quest_map_structure": {
+    "unit": {
+      "unit_id":   "integer 1–4",
+      "unit_name": "string",
+      "quests":    "array of 4 quest objects"
+    },
+    "quest": {
+      "quest_id":    "integer 1–4 within unit",
+      "quest_name":  "string",
+      "lesson_type": "same type for all 3 lessons in this quest",
+      "badge_name":  "string — awarded when position 3 complete",
+      "positions":   "array of 3 lesson objects"
+    },
+    "position_difficulty_rule": {
+      "position_1": "most scaffolding, shortest content, hints shown in practice only",
+      "position_2": "medium scaffolding, hints in practice only, slightly longer content",
+      "position_3": "least scaffolding, no hints in perform, badge awarded on completion"
+    }
+  },
+
+  "validation_checklist": {
+    "_note": "Run these checks before saving any lesson JSON.",
+    "checks": [
+      "meta.lesson_id is unique across all lessons",
+      "meta.grade_bucket is one of: spark | builder | explorer | achiever",
+      "meta.duration_sec is between 30 and 60",
+      "meta.lesson_type matches rounds[].type for all rounds",
+      "quest.position is 1, 2, or 3",
+      "reward.badge is null unless quest.position = 3",
+      "reward.xp matches meta.xp",
+      "reward.unlocks matches quest.unlocks",
+      "every round has model + practice + perform (except refresher)",
+      "model.audio.waveform_color = #22C55E on every round",
+      "perform.scoring.waveform_color = #2563EB on every round",
+      "practice.recording.scored = false on every round",
+      "perform.recording.scored = true on every round",
+      "practice.display.show_hint = true",
+      "perform.display.show_hint = false",
+      "perform.scoring.signals_measured is a subset of meta.signals",
+      "scene_speak: image.alt_text is not empty",
+      "comic_reader: every panel has alt_text",
+      "refresher: auto_generated = true and source_lesson_ids has 3+ entries",
+      "delivery_flashcard: card.back contains no vocabulary definitions or meanings"
+    ]
+  }
+}
